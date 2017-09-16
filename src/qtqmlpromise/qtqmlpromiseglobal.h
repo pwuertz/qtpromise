@@ -1,0 +1,22 @@
+#ifndef QTQMLPROMISE_QTQMLPROMISEGLOBAL_H
+#define QTQMLPROMISE_QTQMLPROMISEGLOBAL_H
+
+// QtPromise
+#include <QtPromise>
+
+// QtCore
+#include <QtGlobal>
+
+#ifdef QTQMLPROMISE_LIBRARY
+#   define QTQMLPROMISE_EXPORT Q_DECL_EXPORT
+#else
+#   define QTQMLPROMISE_EXPORT Q_DECL_IMPORT
+#endif
+
+#ifdef QTPROMISE_NAMESPACE
+#   define QTQMLPROMISE_METATYPE(name) QTPROMISE_NAMESPACE::name
+#else
+#   define QTQMLPROMISE_METATYPE(name) name
+#endif
+
+#endif // ifndef QTQMLPROMISE_QTQMLPROMISEGLOBAL_H

@@ -16,15 +16,13 @@ class QPromiseBase
 public:
     using Type = T;
 
-    QPromiseBase(const QPromiseBase<T>& other): m_d(other.m_d) {}
-    QPromiseBase(const QPromise<T>& other): m_d(other.m_d) {}
-    QPromiseBase(QPromiseBase<T>&& other) { swap(other); }
-
     template <typename F, typename std::enable_if<QtPromisePrivate::ArgsOf<F>::count == 1, int>::type = 0>
     inline QPromiseBase(F resolver);
 
     template <typename F, typename std::enable_if<QtPromisePrivate::ArgsOf<F>::count != 1, int>::type = 0>
     inline QPromiseBase(F resolver);
+
+    QPromiseBase(const QPromise<T>& other): m_d(other.m_d) {}
 
     virtual ~QPromiseBase() { }
 
@@ -55,8 +53,6 @@ public:
 
     inline QPromise<T> delay(int msec) const;
     inline QPromise<T> wait() const;
-
-    void swap(QPromiseBase<T>& other) { qSwap(m_d, other.m_d); }
 
 public: // STATIC
     template <typename E>
