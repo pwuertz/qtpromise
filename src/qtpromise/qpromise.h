@@ -8,7 +8,7 @@
 // Qt
 #include <QExplicitlySharedDataPointer>
 
-namespace QtPromise {
+QTPROMISE_BEGIN_NAMESPACE
 
 template <typename T>
 class QPromiseBase
@@ -100,7 +100,7 @@ private:
     friend class QPromiseBase<void>;
 };
 
-} // namespace QtPromise
+QTPROMISE_END_NAMESPACE
 
 #include "qpromise.inl"
 

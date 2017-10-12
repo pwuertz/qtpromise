@@ -5,7 +5,7 @@
 #include <QtConcurrent>
 #include <QtTest>
 
-using namespace QtPromise;
+QTPROMISE_USE_NAMESPACE
 
 class tst_thread : public QObject
 {

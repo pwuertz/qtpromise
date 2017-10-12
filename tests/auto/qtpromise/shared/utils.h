@@ -4,7 +4,7 @@
 #include <QtPromise>
 
 template <typename T>
-static inline T waitForValue(const QtPromise::QPromise<T>& promise, const T& initial)
+static inline T waitForValue(const QTPROMISE_PREPEND_NAMESPACE(QPromise<T>)& promise, const T& initial)
 {
     T value(initial);
     promise.then([&](const T& res) {
@@ -14,7 +14,7 @@ static inline T waitForValue(const QtPromise::QPromise<T>& promise, const T& ini
 }
 
 template <typename T>
-static inline T waitForValue(const QtPromise::QPromise<void>& promise, const T& initial, const T& expected)
+static inline T waitForValue(const QTPROMISE_PREPEND_NAMESPACE(QPromise<void>)& promise, const T& initial, const T& expected)
 {
     T value(initial);
     promise.then([&]() {
@@ -24,7 +24,7 @@ static inline T waitForValue(const QtPromise::QPromise<void>& promise, const T& 
 }
 
 template <typename T, typename E>
-static inline E waitForError(const QtPromise::QPromise<T>& promise, const E& initial)
+static inline E waitForError(const QTPROMISE_PREPEND_NAMESPACE(QPromise<T>)& promise, const E& initial)
 {
     E error(initial);
     promise.fail([&](const E& err) {
@@ -35,7 +35,7 @@ static inline E waitForError(const QtPromise::QPromise<T>& promise, const E& ini
 }
 
 template <typename E>
-static inline E waitForError(const QtPromise::QPromise<void>& promise, const E& initial)
+static inline E waitForError(const QTPROMISE_PREPEND_NAMESPACE(QPromise<void>)& promise, const E& initial)
 {
     E error(initial);
     promise.fail([&](const E& err) {

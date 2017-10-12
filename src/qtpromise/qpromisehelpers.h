@@ -4,7 +4,7 @@
 // QtPromise
 #include "qpromise_p.h"
 
-namespace QtPromise {
+QTPROMISE_BEGIN_NAMESPACE
 
 template <typename T>
 static inline typename QtPromisePrivate::PromiseDeduce<T>::Type qPromise(T&& value)
@@ -37,6 +37,6 @@ static inline QPromise<void> qPromiseAll(const QVector<QPromise<void> >& promise
     return QPromise<void>::all(promises);
 }
 
-} // namespace QtPromise
+QTPROMISE_END_NAMESPACE
 
 #endif // QTPROMISE_QPROMISEHELPERS_H

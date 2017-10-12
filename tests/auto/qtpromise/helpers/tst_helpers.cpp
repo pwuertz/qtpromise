@@ -4,7 +4,7 @@
 // Qt
 #include <QtTest>
 
-using namespace QtPromise;
+QTPROMISE_USE_NAMESPACE
 
 class tst_helpers : public QObject
 {
@@ -31,7 +31,7 @@ QTEST_MAIN(tst_helpers)
 void tst_helpers::resolve()
 {
     int value = -1;
-    auto p = QtPromise::qPromise(42);
+    auto p = qPromise(42);
 
     Q_STATIC_ASSERT((std::is_same<decltype(p), QPromise<int> >::value));
 
@@ -47,7 +47,7 @@ void tst_helpers::resolve()
 void tst_helpers::resolve_void()
 {
     int value = -1;
-    auto p = QtPromise::qPromise();
+    auto p = qPromise();
 
     Q_STATIC_ASSERT((std::is_same<decltype(p), QPromise<void> >::value));
 
@@ -63,7 +63,7 @@ void tst_helpers::resolve_void()
 void tst_helpers::resolve_promise()
 {
     QString value;
-    auto p = QtPromise::qPromise(
+    auto p = qPromise(
         QPromise<QString>([](const QPromiseResolve<QString>& resolve) {
             QtPromisePrivate::qtpromise_defer([=](){
                 resolve("foo");
@@ -85,7 +85,7 @@ void tst_helpers::resolve_promise()
 void tst_helpers::resolve_promise_void()
 {
     QList<int> values;
-    auto p = QtPromise::qPromise(
+    auto p = qPromise(
         QPromise<void>([&](const QPromiseResolve<void>& resolve) {
             QtPromisePrivate::qtpromise_defer([=, &values](){
                 values << 42;
@@ -107,8 +107,8 @@ void tst_helpers::resolve_promise_void()
 
 void tst_helpers::allFulfilled()
 {
-    auto p0 = QtPromise::qPromise(42);
-    auto p1 = QtPromise::qPromise(44);
+    auto p0 = qPromise(42);
+    auto p1 = qPromise(44);
     auto p2 = QPromise<int>([](const QPromiseResolve<int>& resolve) {
         QtPromisePrivate::qtpromise_defer([=](){
             resolve(43);
@@ -136,8 +136,8 @@ void tst_helpers::allFulfilled()
 
 void tst_helpers::allFulfilled_void()
 {
-    auto p0 = QtPromise::qPromise();
-    auto p1 = QtPromise::qPromise();
+    auto p0 = qPromise();
+    auto p1 = qPromise();
     auto p2 = QPromise<void>([](const QPromiseResolve<void>& resolve) {
         QtPromisePrivate::qtpromise_defer([=](){
             resolve();
@@ -161,8 +161,8 @@ void tst_helpers::allFulfilled_void()
 
 void tst_helpers::allRejected()
 {
-    auto p0 = QtPromise::qPromise(42);
-    auto p1 = QtPromise::qPromise(44);
+    auto p0 = qPromise(42);
+    auto p1 = qPromise(44);
     auto p2 = QPromise<int>([](const QPromiseResolve<int>&, const QPromiseReject<int>& reject) {
         QtPromisePrivate::qtpromise_defer([=](){
             reject(QString("foo"));
@@ -191,8 +191,8 @@ void tst_helpers::allRejected()
 
 void tst_helpers::allRejected_void()
 {
-    auto p0 = QtPromise::qPromise();
-    auto p1 = QtPromise::qPromise();
+    auto p0 = qPromise();
+    auto p1 = qPromise();
     auto p2 = QPromise<void>([](const QPromiseResolve<void>&, const QPromiseReject<void>& reject) {
         QtPromisePrivate::qtpromise_defer([=](){
             reject(QString("foo"));

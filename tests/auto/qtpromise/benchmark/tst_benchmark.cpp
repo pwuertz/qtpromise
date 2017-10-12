@@ -12,7 +12,7 @@
     #define EXCEPT_CALL_COPY_CTOR 0
 #endif
 
-using namespace QtPromise;
+QTPROMISE_USE_NAMESPACE
 
 class tst_benchmark : public QObject
 {

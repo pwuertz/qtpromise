@@ -15,7 +15,7 @@
 #include <QSharedData>
 #include <QPointer>
 
-namespace QtPromise {
+QTPROMISE_BEGIN_NAMESPACE
 
 template <typename T>
 class QPromise;
@@ -26,7 +26,7 @@ class QPromiseResolve;
 template <typename T>
 class QPromiseReject;
 
-} // namespace QtPromise
+QTPROMISE_END_NAMESPACE
 
 namespace QtPromisePrivate {
 
@@ -51,11 +51,11 @@ static void qtpromise_defer(F&& f, QThread* thread = nullptr)
 template <typename T>
 struct PromiseDeduce
 {
-    using Type = QtPromise::QPromise<Unqualified<T> >;
+    using Type = QTPROMISE_PREPEND_NAMESPACE(QPromise<Unqualified<T> >);
 };
 
 template <typename T>
-struct PromiseDeduce<QtPromise::QPromise<T> >
+struct PromiseDeduce<QTPROMISE_PREPEND_NAMESPACE(QPromise<T>) >
     : public PromiseDeduce<T>
 { };
 
@@ -64,20 +64,20 @@ struct PromiseFulfill
 {
     static void call(
         T&& value,
-        const QtPromise::QPromiseResolve<T>& resolve,
-        const QtPromise::QPromiseReject<T>&)
+        const QTPROMISE_PREPEND_NAMESPACE(QPromiseResolve<T>)& resolve,
+        const QTPROMISE_PREPEND_NAMESPACE(QPromiseReject<T>)&)
     {
         resolve(std::move(value));
     }
 };
 
 template <typename T>
-struct PromiseFulfill<QtPromise::QPromise<T> >
+struct PromiseFulfill<QTPROMISE_PREPEND_NAMESPACE(QPromise<T>) >
 {
     static void call(
-        const QtPromise::QPromise<T>& promise,
-        const QtPromise::QPromiseResolve<T>& resolve,
-        const QtPromise::QPromiseReject<T>& reject)
+        const QTPROMISE_PREPEND_NAMESPACE(QPromise<T>)& promise,
+        const QTPROMISE_PREPEND_NAMESPACE(QPromiseResolve<T>)& resolve,
+        const QTPROMISE_PREPEND_NAMESPACE(QPromiseReject<T>)& reject)
     {
         if (promise.isFulfilled()) {
             resolve(promise.m_d->value());
@@ -94,7 +94,7 @@ struct PromiseFulfill<QtPromise::QPromise<T> >
 };
 
 template <>
-struct PromiseFulfill<QtPromise::QPromise<void> >
+struct PromiseFulfill<QTPROMISE_PREPEND_NAMESPACE(QPromise<void>) >
 {
     template <typename TPromise, typename TResolve, typename TReject>
     static void call(
@@ -136,7 +136,7 @@ struct PromiseDispatch
 template <typename T>
 struct PromiseDispatch<T, void>
 {
-    using Promise = QtPromise::QPromise<void>;
+    using Promise = QTPROMISE_PREPEND_NAMESPACE(QPromise<void>);
 
     template <typename THandler, typename TResolve, typename TReject>
     static void call(const T& value, THandler handler, const TResolve& resolve, const TReject& reject)
@@ -170,7 +170,7 @@ struct PromiseDispatch<void, TRes>
 template <>
 struct PromiseDispatch<void, void>
 {
-    using Promise = QtPromise::QPromise<void>;
+    using Promise = QTPROMISE_PREPEND_NAMESPACE(QPromise<void>);
 
     template <typename THandler, typename TResolve, typename TReject>
     static void call(THandler handler, const TResolve& resolve, const TReject& reject)
@@ -241,7 +241,7 @@ struct PromiseHandler<void, THandler, void>
 template <typename T>
 struct PromiseHandler<T, std::nullptr_t, void>
 {
-    using Promise = QtPromise::QPromise<T>;
+    using Promise = QTPROMISE_PREPEND_NAMESPACE(QPromise<T>);
 
     template <typename TResolve, typename TReject>
     static std::function<void(const T&)> create(
@@ -260,7 +260,7 @@ struct PromiseHandler<T, std::nullptr_t, void>
 template <>
 struct PromiseHandler<void, std::nullptr_t, void>
 {
-    using Promise = QtPromise::QPromise<void>;
+    using Promise = QTPROMISE_PREPEND_NAMESPACE(QPromise<void>);
 
     template <typename TResolve, typename TReject>
     static std::function<void()> create(
@@ -282,12 +282,12 @@ struct PromiseCatcher
     using ResType = typename std::result_of<THandler(TArg)>::type;
 
     template <typename TResolve, typename TReject>
-    static std::function<void(const QtPromise::QPromiseError&)> create(
+    static std::function<void(const QTPROMISE_PREPEND_NAMESPACE(QPromiseError)&)> create(
         const THandler& handler,
         const TResolve& resolve,
         const TReject& reject)
     {
-        return [=](const QtPromise::QPromiseError& error) {
+        return [=](const QTPROMISE_PREPEND_NAMESPACE(QPromiseError)& error) {
             try {
                 error.rethrow();
             } catch (const TArg& error) {
@@ -305,12 +305,12 @@ struct PromiseCatcher<T, THandler, void>
     using ResType = typename std::result_of<THandler()>::type;
 
     template <typename TResolve, typename TReject>
-    static std::function<void(const QtPromise::QPromiseError&)> create(
+    static std::function<void(const QTPROMISE_PREPEND_NAMESPACE(QPromiseError)&)> create(
         const THandler& handler,
         const TResolve& resolve,
         const TReject& reject)
     {
-        return [=](const QtPromise::QPromiseError& error) {
+        return [=](const QTPROMISE_PREPEND_NAMESPACE(QPromiseError)& error) {
             try {
                 error.rethrow();
             } catch (...) {
@@ -324,12 +324,12 @@ template <typename T>
 struct PromiseCatcher<T, std::nullptr_t, void>
 {
     template <typename TResolve, typename TReject>
-    static std::function<void(const QtPromise::QPromiseError&)> create(
+    static std::function<void(const QTPROMISE_PREPEND_NAMESPACE(QPromiseError)&)> create(
         std::nullptr_t,
         const TResolve&,
         const TReject& reject)
     {
-        return [=](const QtPromise::QPromiseError& error) {
+        return [=](const QTPROMISE_PREPEND_NAMESPACE(QPromiseError)& error) {
             // 2.2.7.4. If onRejected is not a function and promise1 is rejected,
             // promise2 must be rejected with the same reason as promise1
             reject(error);
@@ -343,7 +343,7 @@ template <typename T, typename F>
 class PromiseDataBase : public QSharedData
 {
 public:
-    using Error = QtPromise::QPromiseError;
+    using Error = QTPROMISE_PREPEND_NAMESPACE(QPromiseError);
     using Handler = std::pair<QPointer<QThread>, std::function<F> >;
     using Catcher = std::pair<QPointer<QThread>, std::function<void(const Error&)> >;
 
@@ -525,6 +525,6 @@ protected:
     }
 };
 
-} // namespace QtPromise
+} // namespace QtPromisePrivate
 
 #endif // ifndef QTPROMISE_QPROMISE_H

@@ -3,7 +3,7 @@
 #include <QSharedPointer>
 #include <QTimer>
 
-namespace QtPromise {
+QTPROMISE_BEGIN_NAMESPACE
 
 template <class T>
 class QPromiseResolve
@@ -283,4 +283,4 @@ inline QPromise<void> QPromise<void>::resolve()
     });
 }
 
-} // namespace QtPromise
+QTPROMISE_END_NAMESPACE

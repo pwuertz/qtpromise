@@ -8,6 +8,22 @@
 #include <functional>
 #include <array>
 
+#if defined(QTPROMISE_NO_NAMESPACE)
+#   undef QTPROMISE_NAMESPACE
+#   define QTPROMISE_PREPEND_NAMESPACE(name) ::name
+#   define QTPROMISE_USE_NAMESPACE
+#   define QTPROMISE_BEGIN_NAMESPACE
+#   define QTPROMISE_END_NAMESPACE
+#else
+#if !defined(QTPROMISE_NAMESPACE)
+#   define QTPROMISE_NAMESPACE QtPromise
+#endif
+#   define QTPROMISE_PREPEND_NAMESPACE(name) ::QTPROMISE_NAMESPACE::name
+#   define QTPROMISE_USE_NAMESPACE using namespace ::QTPROMISE_NAMESPACE;
+#   define QTPROMISE_BEGIN_NAMESPACE namespace QTPROMISE_NAMESPACE {
+#   define QTPROMISE_END_NAMESPACE }
+#endif
+
 namespace QtPromisePrivate
 {
 // https://rmf.io/cxx11/even-more-traits#unqualified_types

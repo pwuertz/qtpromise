@@ -1,11 +1,14 @@
 #ifndef QTPROMISE_QPROMISEFUTURE_P_H
 #define QTPROMISE_QPROMISEFUTURE_P_H
 
+// QtPromise
+#include "qpromiseglobal.h"
+
 // Qt
 #include <QFutureWatcher>
 #include <QFuture>
 
-namespace QtPromise {
+QTPROMISE_BEGIN_NAMESPACE
 
 class QPromiseCanceledException : public QException
 {
@@ -17,7 +20,7 @@ public:
     }
 };
 
-} // namespace QtPromise
+QTPROMISE_END_NAMESPACE
 
 namespace QtPromisePrivate {
 
@@ -31,8 +34,8 @@ struct PromiseFulfill<QFuture<T> >
 {
     static void call(
         const QFuture<T>& future,
-        const QtPromise::QPromiseResolve<T>& resolve,
-        const QtPromise::QPromiseReject<T>& reject)
+        const QTPROMISE_PREPEND_NAMESPACE(QPromiseResolve<T>)& resolve,
+        const QTPROMISE_PREPEND_NAMESPACE(QPromiseReject<T>)& reject)
     {
         using Watcher = QFutureWatcher<T>;
 
@@ -46,7 +49,7 @@ struct PromiseFulfill<QFuture<T> >
                     // rethrown potential exceptions using waitForFinished() and thus detect
                     // if the future has been canceled by the user or an exception.
                     watcher->waitForFinished();
-                    reject(QtPromise::QPromiseCanceledException());
+                    reject(QTPROMISE_PREPEND_NAMESPACE(QPromiseCanceledException()));
                 } else {
                     PromiseFulfill<T>::call(watcher->result(), resolve, reject);
                 }
@@ -66,8 +69,8 @@ struct PromiseFulfill<QFuture<void> >
 {
     static void call(
         const QFuture<void>& future,
-        const QtPromise::QPromiseResolve<void>& resolve,
-        const QtPromise::QPromiseReject<void>& reject)
+        const QTPROMISE_PREPEND_NAMESPACE(QPromiseResolve<void>)& resolve,
+        const QTPROMISE_PREPEND_NAMESPACE(QPromiseReject<void>)& reject)
     {
         using Watcher = QFutureWatcher<void>;
 
@@ -77,7 +80,7 @@ struct PromiseFulfill<QFuture<void> >
                 if (watcher->isCanceled()) {
                     // let's rethrown potential exception
                     watcher->waitForFinished();
-                    reject(QtPromise::QPromiseCanceledException());
+                    reject(QTPROMISE_PREPEND_NAMESPACE(QPromiseCanceledException()));
                 } else {
                     resolve();
                 }

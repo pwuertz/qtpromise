@@ -7,7 +7,7 @@
 // Qt
 #include <QException>
 
-namespace QtPromise {
+QTPROMISE_BEGIN_NAMESPACE
 
 class QPromiseError
 {
@@ -66,6 +66,6 @@ public:
     }
 };
 
-} // namespace QtPromise
+QTPROMISE_END_NAMESPACE
 
 #endif // QTPROMISE_QPROMISEERROR_H

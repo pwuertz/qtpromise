@@ -4,7 +4,7 @@
 // Qt
 #include <QtTest>
 
-using namespace QtPromise;
+QTPROMISE_USE_NAMESPACE
 
 // https://promisesaplus.com/#requirements
 class tst_requirements : public QObject
