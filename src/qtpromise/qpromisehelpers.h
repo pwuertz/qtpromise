@@ -3,6 +3,7 @@
 
 // QtPromise
 #include "qpromise_p.h"
+#include <memory>
 
 namespace QtPromise {
 
@@ -37,6 +38,29 @@ static inline QPromise<void> qPromiseAll(const Sequence<QPromise<void>, Args...>
 {
     return QPromise<void>::all(promises);
 }
+
+class ConnectionGuard {
+public:
+    static std::shared_ptr<ConnectionGuard> create() {
+        return std::shared_ptr<ConnectionGuard>(new ConnectionGuard);
+    }
+    void operator<<(QMetaObject::Connection &&other) {
+        connections.emplace_back(std::move(other));
+    }
+    void disconnect() {
+        for (const auto& connection: connections)
+            QObject::disconnect(connection);
+        connections.clear();
+    }
+    ~ConnectionGuard() {
+        disconnect();
+    }
+protected:
+    std::vector<QMetaObject::Connection> connections;
+    ConnectionGuard() = default;
+    ConnectionGuard(const ConnectionGuard&) = delete;
+    void operator=(const ConnectionGuard&) = delete;
+};
 
 } // namespace QtPromise
 
