@@ -49,6 +49,16 @@ public:
     }
 };
 
+class QPromiseStopIteration : public QException
+{
+public:
+    void raise() const Q_DECL_OVERRIDE { throw *this; }
+    QPromiseStopIteration* clone() const Q_DECL_OVERRIDE
+    {
+        return new QPromiseStopIteration(*this);
+    }
+};
+
 // QPromiseError is provided for backward compatibility and will be
 // removed in the next major version: it wasn't intended to be used
 // directly and thus should not be part of the public API.

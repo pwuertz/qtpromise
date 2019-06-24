@@ -5,6 +5,7 @@ SUBDIRS += \
     connect \
     each \
     filter \
+    iterative \
     map \
     reduce \
     reject \

@@ -8,4 +8,5 @@ HEADERS += \
     $$PWD/qpromiseglobal.h \
     $$PWD/qpromisehelpers.h \
     $$PWD/qpromisehelpers_p.h \
+    $$PWD/qpromiseiterative.h \
     $$PWD/qpromiseresolver.h
