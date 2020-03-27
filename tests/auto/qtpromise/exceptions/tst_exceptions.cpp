@@ -1,10 +1,14 @@
+/*
+ * Copyright (c) Simon Brunel, https://github.com/simonbrunel
+ *
+ * This source code is licensed under the MIT license found in
+ * the LICENSE file in the root directory of this source tree.
+ */
+
 #include "../shared/utils.h"
 
-// QtPromise
-#include <QtPromise>
-
-// Qt
 #include <QtConcurrent>
+#include <QtPromise>
 #include <QtTest>
 
 using namespace QtPromise;
@@ -26,10 +30,12 @@ QTEST_MAIN(tst_exceptions)
 
 namespace {
 
-template <class E>
+template<class E>
 void verify()
 {
-    auto p = QtPromise::resolve(QtConcurrent::run([]() { throw E(); }));
+    auto p = QtPromise::resolve(QtConcurrent::run([]() {
+        throw E();
+    }));
     QCOMPARE(p.isPending(), true);
     QCOMPARE(waitForRejected<E>(p), true);
     QCOMPARE(p.isRejected(), true);

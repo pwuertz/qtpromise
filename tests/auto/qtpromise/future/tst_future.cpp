@@ -1,8 +1,12 @@
-// QtPromise
-#include <QtPromise>
+/*
+ * Copyright (c) Simon Brunel, https://github.com/simonbrunel
+ *
+ * This source code is licensed under the MIT license found in
+ * the LICENSE file in the root directory of this source tree.
+ */
 
-// Qt
 #include <QtConcurrent>
+#include <QtPromise>
 #include <QtTest>
 
 using namespace QtPromise;
@@ -33,14 +37,12 @@ private Q_SLOTS:
 class MyException : public QException
 {
 public:
-    MyException(const QString& error)
-        : m_error(error)
-    { }
+    MyException(const QString& error) : m_error{error} { }
 
     const QString& error() const { return m_error; }
 
     void raise() const { throw *this; }
-    MyException* clone() const { return new MyException(*this); }
+    MyException* clone() const { return new MyException{*this}; }
 
 private:
     QString m_error;
@@ -60,8 +62,8 @@ void tst_future::fulfilled()
     QCOMPARE(p.isPending(), true);
 
     p.then([&](int res) {
-        result = res;
-    }).wait();
+         result = res;
+     }).wait();
 
     QCOMPARE(p.isFulfilled(), true);
     QCOMPARE(result, 42);
@@ -70,14 +72,14 @@ void tst_future::fulfilled()
 void tst_future::fulfilled_void()
 {
     int result = -1;
-    auto p = QtPromise::resolve(QtConcurrent::run([]() { }));
+    auto p = QtPromise::resolve(QtConcurrent::run([]() {}));
 
     Q_STATIC_ASSERT((std::is_same<decltype(p), QPromise<void>>::value));
     QCOMPARE(p.isPending(), true);
 
     p.then([&]() {
-        result = 42;
-    }).wait();
+         result = 42;
+     }).wait();
 
     QCOMPARE(p.isFulfilled(), true);
     QCOMPARE(result, 42);
@@ -87,7 +89,7 @@ void tst_future::rejected()
 {
     QString error;
     auto p = QtPromise::resolve(QtConcurrent::run([]() {
-        throw MyException("foo");
+        throw MyException{"foo"};
         return 42;
     }));
 
@@ -95,19 +97,19 @@ void tst_future::rejected()
     QCOMPARE(p.isPending(), true);
 
     p.fail([&](const MyException& e) {
-        error = e.error();
-        return -1;
-    }).wait();
+         error = e.error();
+         return -1;
+     }).wait();
 
     QCOMPARE(p.isRejected(), true);
-    QCOMPARE(error, QString("foo"));
+    QCOMPARE(error, QString{"foo"});
 }
 
 void tst_future::rejected_void()
 {
     QString error;
     auto p = QtPromise::resolve(QtConcurrent::run([]() {
-        throw MyException("foo");
+        throw MyException{"foo"};
     }));
 
     Q_STATIC_ASSERT((std::is_same<decltype(p), QPromise<void>>::value));
@@ -115,18 +117,18 @@ void tst_future::rejected_void()
     QCOMPARE(p.isPending(), true);
 
     p.fail([&](const MyException& e) {
-        error = e.error();
-    }).wait();
+         error = e.error();
+     }).wait();
 
     QCOMPARE(p.isRejected(), true);
-    QCOMPARE(error, QString("foo"));
+    QCOMPARE(error, QString{"foo"});
 }
 
 void tst_future::unhandled()
 {
     QString error;
     auto p = QtPromise::resolve(QtConcurrent::run([]() {
-        throw QString("foo");
+        throw QString{"foo"};
         return 42;
     }));
 
@@ -135,83 +137,87 @@ void tst_future::unhandled()
     QCOMPARE(p.isPending(), true);
 
     p.fail([&](const QString& err) {
-        error += err;
-        return -1;
-    }).fail([&](const QUnhandledException&) {
-        error += "bar";
-        return -1;
-    }).wait();
+         error += err;
+         return -1;
+     })
+        .fail([&](const QUnhandledException&) {
+            error += "bar";
+            return -1;
+        })
+        .wait();
 
     QCOMPARE(p.isRejected(), true);
-    QCOMPARE(error, QString("bar"));
+    QCOMPARE(error, QString{"bar"});
 }
 
 void tst_future::unhandled_void()
 {
     QString error;
     auto p = QtPromise::resolve(QtConcurrent::run([]() {
-        throw QString("foo");
+        throw QString{"foo"};
     }));
 
     Q_STATIC_ASSERT((std::is_same<decltype(p), QPromise<void>>::value));
     QCOMPARE(p.isPending(), true);
 
     p.fail([&](const QString& err) {
-        error += err;
-    }).fail([&](const QUnhandledException&) {
-        error += "bar";
-    }).wait();
+         error += err;
+     })
+        .fail([&](const QUnhandledException&) {
+            error += "bar";
+        })
+        .wait();
 
     QCOMPARE(p.isRejected(), true);
-    QCOMPARE(error, QString("bar"));
+    QCOMPARE(error, QString{"bar"});
 }
 
 void tst_future::canceled()
 {
     QString error;
-    auto p = QtPromise::resolve(QFuture<int>());  // Constructs an empty, canceled future.
+    auto p = QtPromise::resolve(QFuture<int>()); // Constructs an empty, canceled future.
 
     QCOMPARE(p.isPending(), true);
 
     p.fail([&](const QPromiseCanceledException&) {
-        error = "canceled";
-        return -1;
-    }).wait();
+         error = "canceled";
+         return -1;
+     }).wait();
 
     QCOMPARE(p.isRejected(), true);
-    QCOMPARE(error, QString("canceled"));
+    QCOMPARE(error, QString{"canceled"});
 }
 
 void tst_future::canceled_void()
 {
     QString error;
-    auto p = QtPromise::resolve(QFuture<void>());  // Constructs an empty, canceled future.
+    auto p = QtPromise::resolve(QFuture<void>()); // Constructs an empty, canceled future.
 
     QCOMPARE(p.isPending(), true);
 
     p.fail([&](const QPromiseCanceledException&) {
-        error = "canceled";
-    }).wait();
+         error = "canceled";
+     }).wait();
 
     QCOMPARE(p.isRejected(), true);
-    QCOMPARE(error, QString("canceled"));
+    QCOMPARE(error, QString{"canceled"});
 }
 
 void tst_future::canceledFromThread()
 {
     QString error;
     auto p = QtPromise::resolve(QtConcurrent::run([]() {
-        throw QPromiseCanceledException();
+        throw QPromiseCanceledException{};
     }));
 
     QCOMPARE(p.isPending(), true);
 
     p.fail([&](const QPromiseCanceledException&) {
-        error = "bar";
-    }).wait();
+         error = "bar";
+     }).wait();
 
     QCOMPARE(p.isRejected(), true);
-    QCOMPARE(error, QString("bar"));
+    QCOMPARE(error, QString{"bar"});
 }
 
 void tst_future::then()
@@ -220,19 +226,21 @@ void tst_future::then()
     auto input = QtPromise::resolve(42);
     auto output = input.then([](int res) {
         return QtConcurrent::run([=]() {
-            return QString("foo%1").arg(res);
+            return QString{"foo%1"}.arg(res);
         });
     });
 
     QCOMPARE(input.isFulfilled(), true);
     QCOMPARE(output.isPending(), true);
 
-    output.then([&](const QString& res) {
-        result = res;
-    }).wait();
+    output
+        .then([&](const QString& res) {
+            result = res;
+        })
+        .wait();
 
     QCOMPARE(output.isFulfilled(), true);
-    QCOMPARE(result, QString("foo42"));
+    QCOMPARE(result, QString{"foo42"});
 }
 
 void tst_future::then_void()
@@ -248,54 +256,64 @@ void tst_future::then_void()
     QCOMPARE(input.isFulfilled(), true);
     QCOMPARE(output.isPending(), true);
 
-    output.then([&]() {
-        result += "bar";
-    }).wait();
+    output
+        .then([&]() {
+            result += "bar";
+        })
+        .wait();
 
     QCOMPARE(input.isFulfilled(), true);
-    QCOMPARE(result, QString("foobar"));
+    QCOMPARE(result, QString{"foobar"});
 }
 
 void tst_future::fail()
 {
     QString result;
-    auto input = QPromise<QString>::reject(MyException("bar"));
+    auto input = QPromise<QString>::reject(MyException{"bar"});
     auto output = input.fail([](const MyException& e) {
-        return QtConcurrent::run([](const QString& error) {
-            return QString("foo%1").arg(error);
-        }, e.error());
+        return QtConcurrent::run(
+            [](const QString& error) {
+                return QString{"foo%1"}.arg(error);
+            },
+            e.error());
     });
 
     QCOMPARE(input.isRejected(), true);
     QCOMPARE(output.isPending(), true);
 
-    output.then([&](const QString& res) {
-        result = res;
-    }).wait();
+    output
+        .then([&](const QString& res) {
+            result = res;
+        })
+        .wait();
 
     QCOMPARE(output.isFulfilled(), true);
-    QCOMPARE(result, QString("foobar"));
+    QCOMPARE(result, QString{"foobar"});
 }
 
 void tst_future::fail_void()
 {
     QString result;
-    auto input = QPromise<void>::reject(MyException("bar"));
+    auto input = QPromise<void>::reject(MyException{"bar"});
     auto output = input.fail([&](const MyException& e) {
-        return QtConcurrent::run([&](const QString& error) {
-            result = error;
-        }, e.error());
+        return QtConcurrent::run(
+            [&](const QString& error) {
+                result = error;
+            },
+            e.error());
     });
 
     QCOMPARE(input.isRejected(), true);
     QCOMPARE(output.isPending(), true);
 
-    output.then([&]() {
-        result = result.prepend("foo");
-    }).wait();
+    output
+        .then([&]() {
+            result = result.prepend("foo");
+        })
+        .wait();
 
     QCOMPARE(output.isFulfilled(), true);
-    QCOMPARE(result, QString("foobar"));
+    QCOMPARE(result, QString{"foobar"});
 }
 
 void tst_future::finally()
@@ -303,7 +321,7 @@ void tst_future::finally()
     auto input = QtPromise::resolve(42);
     auto output = input.finally([]() {
         return QtConcurrent::run([]() {
-            return QString("foo");
+            return QString{"foo"};
         });
     });
 
@@ -313,9 +331,11 @@ void tst_future::finally()
     QCOMPARE(output.isPending(), true);
 
     int value = -1;
-    output.then([&](int res) {
-        value = res;
-    }).wait();
+    output
+        .then([&](int res) {
+            value = res;
+        })
+        .wait();
 
     QCOMPARE(output.isFulfilled(), true);
     QCOMPARE(value, 42);
@@ -326,7 +346,7 @@ void tst_future::finallyRejected()
     auto input = QtPromise::resolve(42);
     auto output = input.finally([]() {
         return QtConcurrent::run([]() {
-            throw MyException("foo");
+            throw MyException{"foo"};
         });
     });
 
@@ -336,11 +356,13 @@ void tst_future::finallyRejected()
     QCOMPARE(output.isPending(), true);
 
     QString error;
-    output.fail([&](const MyException& e) {
-        error = e.error();
-        return -1;
-    }).wait();
+    output
+        .fail([&](const MyException& e) {
+            error = e.error();
+            return -1;
+        })
+        .wait();
 
     QCOMPARE(output.isRejected(), true);
-    QCOMPARE(error, QString("foo"));
+    QCOMPARE(error, QString{"foo"});
 }

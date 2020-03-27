@@ -1,10 +1,14 @@
+/*
+ * Copyright (c) Simon Brunel, https://github.com/simonbrunel
+ *
+ * This source code is licensed under the MIT license found in
+ * the LICENSE file in the root directory of this source tree.
+ */
+
 #include "../shared/object.h"
 #include "../shared/utils.h"
 
-// QtPromise
 #include <QtPromise>
-
-// Qt
 #include <QtTest>
 
 using namespace QtPromise;
