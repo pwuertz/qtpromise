@@ -12,5 +12,8 @@
 #include "../src/qtpromise/qpromiseconnections.h"
 #include "../src/qtpromise/qpromisefuture.h"
 #include "../src/qtpromise/qpromisehelpers.h"
+#ifdef QTPROMISE_CORO
+#include "../src/qtpromise/qpromisecoro.h"
+#endif
 
 #endif // QTPROMISE_MODULE_H

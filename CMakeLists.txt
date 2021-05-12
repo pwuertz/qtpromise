@@ -42,7 +42,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         -Wold-style-cast
 #        -Wshadow                   # disabled due to many findings in the current code
         -Wsign-conversion
-        -Wswitch-default
+#        -Wswitch-default           # disabled due to false positives in coroutines
         -Wunused-local-typedefs
 #        -Wuseless-cast             # disabled due to Qt's moc warnings
 
